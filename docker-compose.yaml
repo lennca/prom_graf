@@ -1,0 +1,52 @@
+version: '3.4'
+
+services:
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:v2.40.2
+    restart: always
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    networks:
+      - monitor
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:9.2.5
+    restart: always
+    ports:
+      - 3000:3000
+    networks:
+      - monitor
+  loki:
+    container_name: loki
+    image: grafana/loki:main-1c43a57
+    restart: always
+    ports:
+      - 3100:3100
+    networks:
+      - monitor
+    volumes:
+      - ./loki-config.yaml:/etc/loki/local-config.yaml:Z
+    command: -config.file=/etc/loki/local-config.yaml
+    user: "0"
+  promtail:
+    container_name: promtail
+    image: grafana/promtail:main-1c43a57
+    restart: always
+#    ports:
+#      - 3100:3100
+    networks:
+      - monitor
+    volumes:
+      - ./promtail.yaml:/etc/promtail/promtail.yaml:ro
+      - /var/log:/var/log:ro
+    command: -config.file=/etc/promtail/promtail.yaml
+    depends_on:
+      - loki
+
+networks:
+  monitor:
+    name: monitor
+    driver: bridge
