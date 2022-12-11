@@ -1,0 +1,5 @@
+[monitoring_host]
+192.168.0.1
+
+[raspberry]
+192.168.1.92
