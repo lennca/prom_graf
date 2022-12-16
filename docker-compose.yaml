@@ -8,7 +8,8 @@ services:
     ports:
       - 9090:9090
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prom_data:/prometheus
     networks:
       - monitor
   grafana:
@@ -19,6 +20,10 @@ services:
       - 3000:3000
     networks:
       - monitor
+    volumes:
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      #- grafana-data:/var/lib/grafana
   loki:
     container_name: loki
     image: grafana/loki:main-1c43a57
@@ -28,25 +33,29 @@ services:
     networks:
       - monitor
     volumes:
-      - ./loki-config.yaml:/etc/loki/local-config.yaml:Z
+      - ./loki/loki-config.yaml:/etc/loki/local-config.yaml:Z
     command: -config.file=/etc/loki/local-config.yaml
     user: "0"
-  promtail:
-    container_name: promtail
-    image: grafana/promtail:main-1c43a57
-    restart: always
+#  promtail:
+#    container_name: promtail
+#    image: grafana/promtail:main-1c43a57
+#    restart: always
 #    ports:
 #      - 3100:3100
-    networks:
-      - monitor
-    volumes:
-      - ./promtail.yaml:/etc/promtail/promtail.yaml:ro
-      - /var/log:/var/log:ro
-    command: -config.file=/etc/promtail/promtail.yaml
-    depends_on:
-      - loki
+#    networks:
+#      - monitor
+#    volumes:
+#      - ./promtail.yaml:/etc/promtail/promtail.yaml:ro
+#      - /var/log:/var/log:ro
+#    command: -config.file=/etc/promtail/promtail.yaml
+#    depends_on:
+#      - loki
 
 networks:
   monitor:
     name: monitor
     driver: bridge
+
+volumes:
+  prom_data:
+#  grafana-data:

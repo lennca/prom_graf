@@ -1,0 +1,40 @@
+# https://grafana.com/docs/loki/latest/clients/promtail/configuration/
+# https://docs.docker.com/engine/api/v1.41/#operation/ContainerList
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+#  - url: http://192.168.1.190:3100/loki/api/v1/push
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+ - job_name: syslog
+   syslog:
+     listen_address: 0.0.0.0:1514
+     idle_timeout: 12h
+     use_incoming_timestamp: true
+     label_structured_data: yes
+     labels:
+       job: syslog-receiver
+   relabel_configs:
+     - source_labels: ['__syslog_message_hostname']
+       target_label: host
+     - source_labels: ['__syslog_message_severity']
+       target_label: level
+     - source_labels: ['__syslog_message_facility']
+       target_label: syslog_facility
+     - source_labels: ['__syslog_message_app_name']
+       target_label: syslog_identifier
+         # - job_name: system
+         #   pipeline_stages:
+         #   static_configs:
+         #   - targets:
+         #      - localhost
+         #     labels:
+         #      job: varlogs
+         #      host: yourhost
+         #      __path__: /var/log/*.log

@@ -1,0 +1,10 @@
+### provisioning
+
+In order to provisioning dashboards, we'll need:
+
+* Volume-mount exported dashboards into the directory `/etc/grafana/provisioning`
+* Tell Grafana to use the provisioned dashboards by volume-mount a `dashboard.yaml` file into
+the same directory `/etc/grafana/provisioning`
+* !Important! If exported dashboard from Grafana that you would want to provisioning
+- you'll need to replace all keys `uid` with value `${DS_PROMETHEUS}` with the 
+the value `Prometheus` (defined as the key `name` in the `/datasources/promethehus.yaml`)
